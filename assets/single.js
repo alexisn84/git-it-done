@@ -3,6 +3,9 @@ var issueContainerEl = document.querySelector("#issues-container");
 //reference for limit warning container on html
 var limitWarningEl = document.querySelector("#limit-warning");
 
+//reference to add repo name to header of page
+var repoNameEl = document.querySelector("#repo-name");
+
 
 //extract query string
 var getRepoName = function() {
@@ -10,13 +13,25 @@ var getRepoName = function() {
     var queryString = document.location.search;
 
     var repoName = queryString.split("=")[1];
-    console.log(repoName);
+    
+    //check if values for search/handle errors
+    if (repoName) {
+        //display repo name on page
+        repoNameEl.textContent = repoName;
+
+        getRepoIssues(repoName);
+        //revert to homepage if nothing found
+    }else {
+        document.location.replace("./index.html");
+    }
+
+    repoNameEl.textContent = repoName;
 }
 
 var getRepoIssues = function(repo) {
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
-    // console.log(repo);
-
+    console.log(repo);
+    
     fetch(apiUrl).then(function(response) {
         //request was successful
         if (response.ok) {
@@ -26,15 +41,15 @@ var getRepoIssues = function(repo) {
 
                 //check if api has paginated issues (ie more than 30 issues gets a link to view additional)
                 if (response.headers.get("Link")) {
-                    console.log(displayWarning(repo));
+                    displayWarning(repo);
                 }
             });
         }
-        else {alert ("There was a problem with your request!");
+        else {
+            // if not successful, redirect to homepage
+            document.location.replace("./index.html");
         }
     });
-
-    getRepoName();
 }
 
 //display response data
@@ -97,4 +112,4 @@ var displayWarning = function(repo) {
 
 
 // getRepoIssues();
-// getRepoName()
+getRepoName()
