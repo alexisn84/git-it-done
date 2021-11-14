@@ -6,6 +6,26 @@ var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector('#repos-container');
 var repoSearchTerm = document.querySelector('#repo-search-term');
 
+//var to help call api function when buttons are clicked
+var languageButtonsEl = document.querySelector('#language-buttons');
+
+//function to accept language parameters
+var getFeaturedRepos = function(language) {
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            response.json().then(function(data) {
+                displayRepos(data.items, language);
+                // console.log(response)
+            });
+            
+        } else {
+            alert('GitHub User Not Found');
+        }
+    });
+};
+
 //function executed upon a form sumission browser event
 var formSubmitHandler = function(event) {
     event.preventDefault();
@@ -99,8 +119,25 @@ var displayRepos = function(repos, searchTerm) {
     }
 };
 
+//create buttonClickHandler function
+var buttonClickHandler = function(event) {
+    var language = event.target.getAttribute("data-language");
+    console.log(language);
+
+    //call getFeaturedRepo function and pass value
+    if (language) {
+        getFeaturedRepos(language);
+    
+        // clear old content
+        repoContainerEl.textContent = "";
+    }
+}
+
 //submit event listener for when submit button is clicked
 userFormEl.addEventListener("submit", formSubmitHandler);
+
+//click event listener to the <div> that will call buttonClickHandler()
+languageButtonsEl.addEventListener("click", buttonClickHandler);
 
 //codes that got replaced above but good for study materials!
 //call getUserRepos
